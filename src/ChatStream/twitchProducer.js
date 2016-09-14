@@ -3,7 +3,7 @@ var irc = require('irc');
 var https = require('https');
 var _ = require('lodash');
 var channelService = require('./channelService');
-var env = require('./env.json')
+var env = require('../../env.json')
 var kafka = require('kafka-node');
 
 var Producer = kafka.HighLevelProducer;
