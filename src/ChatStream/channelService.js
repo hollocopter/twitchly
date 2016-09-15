@@ -1,9 +1,16 @@
 var async = require('async');
 var _ = require('lodash');
 var https = require('https');
+var env = require('../../env.json')
 
 var getStreams = function(offset, callback){
-    https.get('https://api.twitch.tv/kraken/streams?limit=100&language=en&offset=' + offset, (res) => {
+    var options = {
+        hostname: 'api.twitch.tv',
+        path: '/kraken/streams/?limit=100&language=en&offset=' + offset,
+        method: 'GET',
+        headers: {'Client-ID':env.TWITCH_CLIENT_ID}
+    }
+    https.get(options, (res) => {
         var streams = ''
         res.on('data', (d) => {
             streams += d;
