@@ -23,9 +23,15 @@ producer.on("ready", function(){
         });
 
         client.addListener('message', function (from, to, message) {
+            var twitchMessage = {
+                "Time": new Date().toISOString(),
+                "Channel": to,
+                "User": from,
+                "Message": message
+            }
             var message = [{
                 topic: 'topic',
-                messages: '{"Time":"' + new Date().toISOString() + '","Channel":"' + to + '", "User":"' + from + '", "Message":"' + message + '"}'
+                messages: JSON.stringify(twitchMessage)
             }];
             producer
                 .send(message, function(err, data){
