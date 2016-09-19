@@ -1,12 +1,14 @@
+// DEPENDENCY
 var async = require('async');
 var _ = require('lodash');
 var https = require('https');
 var env = require('../../env.json')
 
+// Get the names of 100 streams (maximum via REST API)
 var getStreams = function(offset, callback){
     var options = {
         hostname: 'api.twitch.tv',
-        path: '/kraken/streams/?limit=100&language=en&offset=' + offset,
+        path: '/kraken/streams/?limit=100&offset=' + offset,
         method: 'GET',
         headers: {'Client-ID':env.TWITCH_CLIENT_ID}
     }
@@ -26,6 +28,7 @@ var getStreams = function(offset, callback){
     })
 }
 
+// Get the names of the top 500 streams
 module.exports.get500 = function(callback){
     async.parallel({
         one: function(cb){
