@@ -19,16 +19,13 @@ var getStreams = function(offset, callback){
         });
 
         res.on('end', () => {
-            obj = JSON.parse(streams)
-            result = _.map(obj.streams, function(stream){
-                return '#' + stream.channel.name;
-            })
-            callback(null,result)
+            obj = JSON.parse(streams).streams;
+            callback(null,obj)
         })
     })
 }
 
-// Get the names of the top 500 streams
+// Get the names of the top 1000 streams
 module.exports.get500 = function(callback){
     async.parallel({
         one: function(cb){
