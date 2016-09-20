@@ -1,0 +1,10 @@
+{
+  "CASSANDRA_DNS": "",
+  "CHAT_TOPIC": "",
+  "WINDOW_SIZE": 30,
+  "WINDOW_SLIDE": 10,
+  "TWITCH_USERNAME": "",
+  "TWITCH_OAUTH": "",
+  "KAFKA_CONNECTION_STRING": "",
+  "TWITCH_CLIENT_ID": ""
+}

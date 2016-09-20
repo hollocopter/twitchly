@@ -1,2 +1,6 @@
-env.json
-src/ChatStream/node_modules
+javaFlink.iml
+target/
+.idea/
+**/.DS_Store
+**/node_modules
+**/application.json

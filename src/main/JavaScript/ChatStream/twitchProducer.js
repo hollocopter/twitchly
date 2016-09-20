@@ -3,7 +3,7 @@ var irc = require('irc');
 var https = require('https');
 var _ = require('lodash');
 var channelService = require('./channelService');
-var env = require('../../env.json')
+var env = require('../../resources/application.json')
 var kafka = require('kafka-node');
 
 // Kafka Setup
@@ -13,7 +13,7 @@ var producer = new Producer(client);
 
 // Once our producer is available:
 producer.on("ready", function(){
-    
+
     // Get our top 500 channels
     channelService.get500(function(err,channels){
         if (err){

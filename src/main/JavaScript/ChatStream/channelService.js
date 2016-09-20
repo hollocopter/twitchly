@@ -2,7 +2,7 @@
 var async = require('async');
 var _ = require('lodash');
 var https = require('https');
-var env = require('../../env.json')
+var env = require('../../resources/application.json')
 
 // Get the names of 100 streams (maximum via REST API)
 var getStreams = function(offset, callback){
