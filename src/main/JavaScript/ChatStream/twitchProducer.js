@@ -31,13 +31,13 @@ producer.on("ready", function(){
                 if (err){
                     console.err("There was a problem accessing Twitch REST API:", err)
                 }
-                else {
+                else if (channels.length > 0){
                     iteration++;
 
                     // Get channels we haven't joined yet
-                    var added = _.uniqBy(_.differenceWith(channels,connectedChannels,(a,b) => a.channel.name === b.channel.name),(x) => x.channel.name)
+                    var added = _.uniqBy(_.differenceWith(channels,connectedChannels,channelComparator),(x) => x.channel.name)
                     // Get channels to disconnect from
-                    var removed = _.uniqBy(_.differenceWith(connectedChannels,channels,(a,b) => a.channel.name === b.channel.name),(x) => x.channel.name)
+                    var removed = _.uniqBy(_.differenceWith(connectedChannels,channels,channelComparator),(x) => x.channel.name)
 
                     var joinChannels = _.map(added, (x) => function(callback){
                         client.join('#' + x.channel.name, function(){
@@ -103,3 +103,8 @@ producer.on("ready", function(){
         });
     });
 });
+
+function channelComparator(a,b){
+    if(!a || !b || !a.channel || !b.channel) return false;
+    else return a.channel.name === b.channel.name;
+}
