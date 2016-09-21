@@ -7,6 +7,7 @@ import org.apache.flink.api.common.functions.FoldFunction;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
+import org.apache.flink.api.java.tuple.Tuple5;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.windowing.WindowFunction;
@@ -46,19 +47,19 @@ public class TwitchConsumer {
                 .addSource(new FlinkKafkaConsumer09<>(Topic, new SimpleStringSchema(), properties));
 
 
-        DataStream<Tuple3<String, Long, Integer>> counts =
+        DataStream<Tuple5<String, Long, Integer, Integer, String>> counts =
                 // split up the lines in pairs (2-tuples) containing: (word,1)
                 text.flatMap(new LineSplitter())
-                        // group by the tuple field "0" and sum up tuple field "1"
-                        .keyBy(new KeySelector<String,String>() {
-                            public String getKey(String str) { return str; }
+                        
+                        .keyBy(new KeySelector<Tuple3<String,Integer,String>,String>() {
+                            public String getKey(Tuple3<String,Integer,String> in) { return in.getField(0); }
                         })
                         .timeWindow(Time.seconds(WindowSize), Time.seconds(WindowSlide))
-                        .apply(new Tuple3<String, Long, Integer>("",0L, 0), new MyFoldFunction(), new MyWindowFunction());
+                        .apply(new Tuple5<String, Long, Integer, Integer, String>("",0L, 0, 0, ""), new MyFoldFunction(), new MyWindowFunction());
 
 
         CassandraSink.addSink(counts)
-                .setQuery("INSERT INTO test.values (channel, time, count) values (?, ?, ?);")
+                .setQuery("INSERT INTO test.values2 (channel, time, count, viewers, game) values (?, ?, ?, ?, ?);")
                 .setClusterBuilder(new ClusterBuilder() {
                     @Override
                     public Cluster buildCluster(Cluster.Builder builder) {
@@ -73,25 +74,30 @@ public class TwitchConsumer {
     }
 
     private static class MyFoldFunction
-            implements FoldFunction<String, Tuple3<String, Long, Integer> > {
+            implements FoldFunction< Tuple3<String,Integer,String>, Tuple5<String, Long, Integer, Integer, String> > {
 
-        public Tuple3<String, Long, Integer> fold(Tuple3<String, Long, Integer> acc, String s) {
+        public Tuple5<String, Long, Integer, Integer, String> fold(Tuple5<String, Long, Integer, Integer, String> acc, Tuple3<String,Integer,String> s) {
             String cur0 = acc.getField(0);
             Long cur1 = acc.getField(1);
             Integer cur2 = acc.getField(2);
-            return new Tuple3<String,Long,Integer>(cur0, cur1,cur2+1);
+            Integer cur3 = s.getField(1);
+            String cur4 = s.getField(2);
+            return new Tuple5<String,Long,Integer, Integer, String>(cur0, cur1,cur2+1,cur3,cur4);
         }
     }
 
     private static class MyWindowFunction
-            implements WindowFunction<Tuple3<String, Long, Integer>, Tuple3<String, Long, Integer>, String, TimeWindow> {
+            implements WindowFunction<Tuple5<String, Long, Integer, Integer, String>, Tuple5<String, Long, Integer, Integer, String>, String, TimeWindow> {
 
         public void apply(String key,
                           TimeWindow window,
-                          Iterable<Tuple3<String, Long, Integer>> counts,
-                          Collector<Tuple3<String, Long, Integer>> out) {
-            Integer count = counts.iterator().next().getField(2);
-            out.collect(new Tuple3<String, Long, Integer>(key, window.getEnd(),count));
+                          Iterable<Tuple5<String, Long, Integer, Integer, String>> counts,
+                          Collector<Tuple5<String, Long, Integer, Integer, String>> out) {
+            Tuple5<String,Long,Integer,Integer,String> next = counts.iterator().next();
+            Integer count = next.getField(2);
+            Integer viewers = next.getField(3);
+            String game = next.getField(4);
+            out.collect(new Tuple5<String, Long, Integer, Integer, String>(key, window.getEnd(),count, viewers, game));
         }
     }
 
@@ -100,31 +106,16 @@ public class TwitchConsumer {
      * FlatMapFunction. The function takes a line (String) and splits it into
      * multiple pairs in the form of "(word,1)" (Tuple2<String, Integer>).
      */
-    public static final class LineSplitter implements FlatMapFunction<String, String> {
+    public static final class LineSplitter implements FlatMapFunction<String, Tuple3<String,Integer,String>> {
 
         @Override
-        public void flatMap(String value, Collector<String> out) {
+        public void flatMap(String value, Collector<Tuple3<String,Integer,String>> out) {
 
             JSONObject obj = new JSONObject(value);
-//			String message = obj.getString("Message");
             String channel = obj.getString("Channel");
-//			String user = obj.getString("User");
-            out.collect(channel);
-
-        }
-    }
-
-    public static final class LineSplitterTuple implements FlatMapFunction<String, Tuple2<String,Integer>> {
-
-        @Override
-        public void flatMap(String value, Collector<Tuple2<String,Integer>> out) {
-
-            JSONObject obj = new JSONObject(value);
-
-            String channel = obj.getString("Channel");
-            Tuple2<String,Integer> output = new Tuple2(channel, 1);
-
-            out.collect(output);
+            Integer viewers = obj.getInt("Viewers");
+            String game = obj.getString("Game");
+            out.collect(new Tuple3<String,Integer,String>(channel,viewers,game));
 
         }
     }
