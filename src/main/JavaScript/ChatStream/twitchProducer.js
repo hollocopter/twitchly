@@ -105,6 +105,9 @@ producer.on("ready", function(){
 });
 
 function channelComparator(a,b){
-    if(!a || !b || !a.channel || !b.channel) return false;
+    if(!a || !b || !a.channel || !b.channel) {
+        console.err(a,b)
+        return false;
+    }
     else return a.channel.name === b.channel.name;
 }
