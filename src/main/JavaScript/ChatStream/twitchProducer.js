@@ -109,5 +109,5 @@ function channelComparator(a,b){
 }
 
 function channelValidator(channels){
-    _.every(channel, (x) => !!x && !!x.channel && !!x.channel.name);
+    return _.every(channels, (x) => !!x && !!x.channel && !!x.channel.name);
 }
