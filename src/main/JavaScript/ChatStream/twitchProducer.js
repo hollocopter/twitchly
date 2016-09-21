@@ -31,7 +31,7 @@ producer.on("ready", function(){
                 if (err){
                     console.log("There was a problem accessing Twitch REST API:", err)
                 }
-                else if (channels.length > 0){
+                else if (channelValidator(channels)){
                     iteration++;
 
                     // Get channels we haven't joined yet
@@ -105,9 +105,9 @@ producer.on("ready", function(){
 });
 
 function channelComparator(a,b){
-    if(!a || !b || !a.channel || !b.channel) {
-        console.log(a,b)
-        return false;
-    }
-    else return a.channel.name === b.channel.name;
+    return a.channel.name === b.channel.name;
+}
+
+function channelValidator(channels){
+    _.every(channel, (x) => !!x && !!x.channel && !!x.channel.name);
 }
