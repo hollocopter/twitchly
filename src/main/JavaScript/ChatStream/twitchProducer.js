@@ -29,7 +29,7 @@ producer.on("ready", function(){
             // Get our top 1000 channels
             channelService.get500(function(err,channels){
                 if (err){
-                    console.err("There was a problem accessing Twitch REST API:", err)
+                    console.log("There was a problem accessing Twitch REST API:", err)
                 }
                 else if (channels.length > 0){
                     iteration++;
@@ -55,7 +55,7 @@ producer.on("ready", function(){
 
                     async.parallel(joinChannels, function(err, results){
                         if(err){
-                            console.err('There was a problem joining a channel');
+                            console.log('There was a problem joining a channel');
                         }
                         else {
                             // Update any existing channels with new data
@@ -66,7 +66,7 @@ producer.on("ready", function(){
                             if (iteration > 18)
                             async.parallel(partChannels, function(err, results){
                                 if(err){
-                                    console.err('There was a problem parting a channel');
+                                    console.log('There was a problem parting a channel');
                                 }
                                 else {
                                     iteration = 0;
@@ -99,14 +99,14 @@ producer.on("ready", function(){
         }];
         // console.log(twitchMessage.User, twitchMessage.Channel)
         producer.send(message, function(err, data){
-            if(err) console.err("Error sending message to Kafka:", err);
+            if(err) console.log("Error sending message to Kafka:", err);
         });
     });
 });
 
 function channelComparator(a,b){
     if(!a || !b || !a.channel || !b.channel) {
-        console.err(a,b)
+        console.log(a,b)
         return false;
     }
     else return a.channel.name === b.channel.name;
