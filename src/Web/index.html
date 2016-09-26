@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html ng-app="myapp">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <script type="text/javascript" src="node_modules/angular/angular.min.js"></script>
+        <script src="https://code.highcharts.com/stock/highstock.src.js"></script>
+        <script type="text/javascript" src="node_modules/highcharts-ng/dist/highcharts-ng.js"></script>
+        <script type="text/javascript" src="app.js"></script>
+    </head>
+    <body>
+        <div ng-controller="myctrl as server">
+            <div class="row">
+                <highchart id="chart1" config="chartConfig" class="span10"></highchart>
+            </div>
+        </div>
+    </body>
+</html>
