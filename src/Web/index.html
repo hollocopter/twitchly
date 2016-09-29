@@ -1,17 +1,45 @@
 <!DOCTYPE html>
 <html ng-app="myapp">
     <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <script type="text/javascript" src="node_modules/angular/angular.min.js"></script>
+        <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
+
+        <script src="/node_modules/angular/angular.js"></script>
         <script src="https://code.highcharts.com/stock/highstock.src.js"></script>
         <script type="text/javascript" src="node_modules/highcharts-ng/dist/highcharts-ng.js"></script>
         <script type="text/javascript" src="app.js"></script>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
     </head>
     <body>
-        <div ng-controller="myctrl as server">
+        <div ng-controller="myctrl as server" class="container">
+            <br>
             <div class="row">
-                <highchart id="chart1" config="chartConfig" class="span10"></highchart>
+                <ul class="nav nav-tabs">
+                  <li ng-repeat="tab in tabs" role="presentation" ng-click="updateTab(tab)"><a href="#">{{tab.name}}</a></li>
+                </ul>
             </div>
+            <br>
+            <div class="row">
+                <div class="col-xs-3">
+                    <h4>Top 10</h4>
+                    <div class="list-group">
+                        <li class="list-group-item" ng-repeat="channel in top10" ng-click="update(channel.name)">
+                               {{$index+1}}:  {{channel.name}}
+                            <span class="badge pull-xs-right">{{channel.value}}</span>
+                        </li>
+                    </div>
+                </div>
+                <div class="col-xs-9">
+                    <highchart id="chart1" config="chartConfig"></highchart>
+
+
+                </div>
+            </div>
+            <a href="https://docs.google.com/presentation/d/1s18JfBFdB2-KnQ-3Beszn2f92VEBUGHU0JVwtWtP_HM/edit?usp=sharing">SLIDES<a>
+
         </div>
+
+
     </body>
 </html>
