@@ -39,6 +39,7 @@ myapp.controller('myctrl', function ($scope, $timeout, $http, $interval) {
     $scope.currentChannel = 'reynad27'
     $scope.currentRanking = 'mostActive'
     $scope.currentMapping = mapToChatFreq
+    $scope.currentTab = 'Most Active'
     $scope.top10 = [];
 
 
@@ -66,6 +67,7 @@ myapp.controller('myctrl', function ($scope, $timeout, $http, $interval) {
         $scope.currentRanking = tab.ranking;
         $scope.updateTop10(tab.ranking,function(){$scope.update(function(){return})});
         $scope.currentMapping = tab.map;
+        $scope.currentTab = tab.name;
     }
 
     $scope.updateChannel = function(channel){
