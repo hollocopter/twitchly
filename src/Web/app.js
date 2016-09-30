@@ -1,8 +1,8 @@
-//See: https://github.com/pablojim/highcharts-ng
 var myapp = angular.module('myapp', ["highcharts-ng"]);
 
 myapp.controller('myctrl', function ($scope, $timeout, $http, $interval) {
 
+    // Get the current date to display by default
     var curDate = new Date();
     var year = curDate.getUTCFullYear();
     var month = '0' + (curDate.getUTCMonth() + 1);
@@ -13,6 +13,7 @@ myapp.controller('myctrl', function ($scope, $timeout, $http, $interval) {
 
     var dateString = '' + year + month + date
 
+    /* Map historical data set various ways */
     var mapToViewers = function(dataPoint){
         return [convertDate(dataPoint),dataPoint.viewers]
     }
@@ -29,6 +30,7 @@ myapp.controller('myctrl', function ($scope, $timeout, $http, $interval) {
         return [convertDate(dataPoint), dataPoint.messageLength / dataPoint.count]
     }
 
+    // Date conversion from YYYYMMDD
     var convertDate = function(dataPoint){
         var year = dataPoint.date.substring(0,4);
         var month = dataPoint.date.substring(4,6);
@@ -36,13 +38,14 @@ myapp.controller('myctrl', function ($scope, $timeout, $http, $interval) {
         return new Date(year, parseInt(month) - 1, day).getTime() + dataPoint.time
     }
 
+    // Set up some defaults
     $scope.currentChannel = 'reynad27'
     $scope.currentRanking = 'mostActive'
     $scope.currentMapping = mapToChatFreq
     $scope.currentTab = 'Most Active'
     $scope.top10 = [];
 
-
+    // Pull historical data to update the graph
     $scope.update = function(cb){
         $http.get('http://52.23.210.67/api/' + $scope.currentChannel + '/' + dateString)
             .success(function(data){
@@ -55,6 +58,7 @@ myapp.controller('myctrl', function ($scope, $timeout, $http, $interval) {
             })
     }
 
+    // Pull top 10
     $scope.updateTop10 = function(ranking, cb){
         $http.get('http://52.23.210.67/api/' + ranking + '/')
             .success(function(data){
@@ -63,6 +67,7 @@ myapp.controller('myctrl', function ($scope, $timeout, $http, $interval) {
             });
     }
 
+    // When a tab is selected
     $scope.updateTab = function(tab){
         $scope.currentRanking = tab.ranking;
         $scope.updateTop10(tab.ranking,function(){$scope.update(function(){return})});
@@ -70,19 +75,20 @@ myapp.controller('myctrl', function ($scope, $timeout, $http, $interval) {
         $scope.currentTab = tab.name;
     }
 
+    // When a channel is selected
     $scope.updateChannel = function(channel){
         $scope.currentChannel = channel;
         $scope.update(function(){
+            // redraw the chart
             $scope.chartConfig.options.dummy = new Date();
         });
     }
 
-
+    // On load, get the top 10 and draw the top channel graph
     $scope.updateTop10($scope.currentRanking, function(){
         $scope.currentChannel = $scope.top10[0].name;
         $scope.update(function(){});
     });
-
 
     $scope.tabs = [
         {
@@ -105,6 +111,7 @@ myapp.controller('myctrl', function ($scope, $timeout, $http, $interval) {
         }
     ]
 
+    // Chart Configuration
     $scope.chartConfig = {
         options: {
             chart: {
@@ -144,6 +151,7 @@ myapp.controller('myctrl', function ($scope, $timeout, $http, $interval) {
         }
     }
 
+    // Update the chart and top 10 every 5 seconds
     $interval(function(){
         $scope.update(function(){$scope.updateTop10($scope.currentRanking,function(){return})})
     }, 5000)
