@@ -3,6 +3,15 @@ var myapp = angular.module('myapp', ["highcharts-ng"]);
 
 myapp.controller('myctrl', function ($scope, $timeout, $http, $interval) {
 
+    var curDate = new Date();
+    var year = curDate.getUTCFullYear();
+    var month = '0' + (curDate.getUTCMonth() + 1);
+    var date = '0' + curDate.getUTCDate();
+    month = month.substring(month.length - 2);
+    date = date.substring(date.length - 2);
+
+
+    var dateString = '' + year + month + date
 
     var mapToViewers = function(dataPoint){
         return [convertDate(dataPoint),dataPoint.viewers]
@@ -16,6 +25,10 @@ myapp.controller('myctrl', function ($scope, $timeout, $http, $interval) {
         return [convertDate(dataPoint), dataPoint.count * 2 / (dataPoint.viewers/1000)]
     }
 
+    var mapToSpam = function(dataPoint){
+        return [convertDate(dataPoint), dataPoint.messageLength / dataPoint.count]
+    }
+
     var convertDate = function(dataPoint){
         var year = dataPoint.date.substring(0,4);
         var month = dataPoint.date.substring(4,6);
@@ -25,40 +38,48 @@ myapp.controller('myctrl', function ($scope, $timeout, $http, $interval) {
 
     $scope.currentChannel = 'reynad27'
     $scope.currentRanking = 'mostActive'
-    $scope.currentMapping = mapToEngagement
+    $scope.currentMapping = mapToChatFreq
     $scope.top10 = [];
 
 
-    $scope.update = function(channel){
-        $scope.currentChannel = channel;
-        $http.get('http://52.23.210.67/api/' + $scope.currentChannel + '/20160929')
+    $scope.update = function(cb){
+        $http.get('http://52.23.210.67/api/' + $scope.currentChannel + '/' + dateString)
             .success(function(data){
                 $scope.chartConfig.title.text = data.channelName;
                 $scope.chartConfig.series = [{
                     id: data.channelName,
                     data: data.channelViews.map($scope.currentMapping)
                 }]
-                $scope.chartConfig.options.dummy = new Date();
+                cb();
             })
     }
 
-    $scope.updateTop10 = function(ranking){
+    $scope.updateTop10 = function(ranking, cb){
         $http.get('http://52.23.210.67/api/' + ranking + '/')
             .success(function(data){
                 $scope.top10 = data.top;
+                cb();
             });
     }
 
     $scope.updateTab = function(tab){
         $scope.currentRanking = tab.ranking;
-        $scope.updateTop10(tab.ranking);
+        $scope.updateTop10(tab.ranking,function(){$scope.update(function(){return})});
         $scope.currentMapping = tab.map;
     }
 
+    $scope.updateChannel = function(channel){
+        $scope.currentChannel = channel;
+        $scope.update(function(){
+            $scope.chartConfig.options.dummy = new Date();
+        });
+    }
 
 
-    $scope.update($scope.currentChannel);
-    $scope.updateTop10($scope.currentRanking);
+    $scope.updateTop10($scope.currentRanking, function(){
+        $scope.currentChannel = $scope.top10[0].name;
+        $scope.update(function(){});
+    });
 
 
     $scope.tabs = [
@@ -71,6 +92,14 @@ myapp.controller('myctrl', function ($scope, $timeout, $http, $interval) {
             name: "Most Active",
             ranking: 'mostActive',
             map: mapToChatFreq
+        },{
+            name: "Most Engaged",
+            ranking: 'mostEngaged',
+            map: mapToEngagement
+        },{
+            name: "Spam Rating",
+            ranking: 'mostSpammed',
+            map: mapToSpam
         }
     ]
 
@@ -103,7 +132,7 @@ myapp.controller('myctrl', function ($scope, $timeout, $http, $interval) {
         },
         series: [],
         title: {
-            text: "test"
+            text: ""
         },
         useHighStocks: true,
         func: function(chart) {
@@ -114,9 +143,7 @@ myapp.controller('myctrl', function ($scope, $timeout, $http, $interval) {
     }
 
     $interval(function(){
-        $scope.update($scope.currentChannel)
+        $scope.update(function(){$scope.updateTop10($scope.currentRanking,function(){return})})
     }, 5000)
-    $interval(function(){
-        $scope.updateTop10($scope.currentRanking)
-    }, 6000)
+
 });
