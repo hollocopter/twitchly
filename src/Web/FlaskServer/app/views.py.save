@@ -1,0 +1,32 @@
+# jsonify creates a json representation of the response
+from flask import jsonify
+
+from app import app
+
+# importing Cassandra modules from the driver we just installed
+from cassandra.cluster import Cluster
+from cassandra.policies import WhiteListRoundRobinPolicy
+
+lbp = WhiteListRoundRobinPolicy(['52.45.178.20','52.45.179.54','52.45.140.93','52.45.178.112'])
+# Setting up connections to cassandra
+
+# Change the bolded text to your seed node public dns (no < or > symbols but keep quotations. Be careful to copy quotations as it might copy it as a special character and throw an error. Just delete the quotations and type them in and it should be fine. Also delete this comment line
+cluster = Cluster(['ec2-52-45-178-112.compute-1.amazonaws.com'],load_balancing_policy = lbp)
+
+# Change the bolded text to the keyspace which has the table you want to query. Same as above for < or > and quotations. Also delete this comment line
+session = cluster.connect('test')
+
+@app.route('/')
+@app.route('/index')
+def index():
+  return "Hello, World!"
+
+@app.route('/api/<channel>')
+def get_channel_data(channel):
+       stmt = "SELECT * FROM values WHERE channel = %s"
+       response = session.execute(stmt, parameters=[channel])
+       response_list = []
+       for val in response:
+            response_list.append(val)
+       jsonresponse = [{"channel": x.channel, "count": x.count, "time": x.time} for x in response_list]
+       return jsonify(channelViews=jsonresponse)
