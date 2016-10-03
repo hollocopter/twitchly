@@ -47,7 +47,7 @@ myapp.controller('myctrl', function ($scope, $timeout, $http, $interval) {
 
     // Pull historical data to update the graph
     $scope.update = function(cb){
-        $http.get('http://52.23.210.67/api/' + $scope.currentChannel + '/' + dateString)
+        $http.get('http://'+ config.FlaskIP +'/api/' + $scope.currentChannel + '/' + dateString)
             .success(function(data){
                 $scope.chartConfig.title.text = data.channelName;
                 $scope.chartConfig.series = [{
@@ -60,7 +60,7 @@ myapp.controller('myctrl', function ($scope, $timeout, $http, $interval) {
 
     // Pull top 10
     $scope.updateTop10 = function(ranking, cb){
-        $http.get('http://52.23.210.67/api/' + ranking + '/')
+        $http.get('http://'+ config.FlaskIP +'/api/' + ranking + '/')
             .success(function(data){
                 $scope.top10 = data.top;
                 cb();
