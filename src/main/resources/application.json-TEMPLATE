@@ -6,5 +6,7 @@
   "TWITCH_USERNAME": "",
   "TWITCH_OAUTH": "",
   "KAFKA_CONNECTION_STRING": "",
-  "TWITCH_CLIENT_ID": ""
+  "TWITCH_CLIENT_ID": "",
+  "REDIS_IP": "",
+  "CASSANDRA_WHITELIST": ["","","",""]
 }
