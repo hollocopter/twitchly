@@ -2,24 +2,28 @@
 from flask import jsonify
 from flask_cors import CORS, cross_origin
 import redis
+import json
 
 from app import app
 CORS(app)
+
+with open('../../main/resources/application.json', 'r') as f:
+    config = json.load(f)
 
 # importing Cassandra modules from the driver we just installed
 from cassandra.cluster import Cluster
 from cassandra.policies import WhiteListRoundRobinPolicy
 
-lbp = WhiteListRoundRobinPolicy(['52.45.178.20','52.45.179.54','52.45.140.93','52.45.178.112'])
+lbp = WhiteListRoundRobinPolicy(config['CASSANDRA_WHITELIST'])
 # Setting up connections to cassandra
 
 # Change the bolded text to your seed node public dns (no < or > symbols but keep quotations. Be careful to copy quotations as it might copy it as a special character and throw an error. Just delete the quotations and type them in and it should be fine. Also delete this comment line
-cluster = Cluster(['ec2-52-45-178-112.compute-1.amazonaws.com'],load_balancing_policy=lbp)
+cluster = Cluster([config['CASSANDRA_DNS']],load_balancing_policy=lbp)
 
 # Change the bolded text to the keyspace which has the table you want to query. Same as above for < or > and quotations. Also delete this comment line
 session = cluster.connect('twitchly')
 
-redisConnection = redis.StrictRedis(host='52.45.178.20', port=6379, db=0)
+redisConnection = redis.StrictRedis(host=config['REDIS_IP'], port=6379, db=0)
 
 
 @app.route('/')
