@@ -1,6 +1,6 @@
 # Twitchly - Track your chat rooms in real-time.
 
-Twitchly [twitchly.xyz] (http://twitchly.xyz) is a real-time chat room analytics platform powered by Kafka, Flink, Cassandra, Redis, Flask, and AngularJS. Twitchly allows advertisers or content creators to monitor Twitch.tv channel metrics in real-time or historically. These metrics can provide insight into which channels are the most exciting (and possibly most valuable) at any given time.
+Twitchly [(twitchly.xyz)] (http://twitchly.xyz) is a real-time chat room analytics platform powered by Kafka, Flink, Cassandra, Redis, Flask, and AngularJS. Twitchly allows advertisers or content creators to monitor Twitch.tv channel metrics in real-time or historically. These metrics can provide insight into which channels are the most exciting (and possibly most valuable) at any given time.
 
 ## Data Pipeline
 
@@ -24,7 +24,7 @@ Ingestion is handled by a NodeJS Kafka producer script which maintains a connect
 
 ## Stream Processing
 
-Apache Flink.
+Apache Flink is used as the stream processing framework for this project. Flink provides a simple API for doing windowed calculations on a data stream. In this use case, that is valuable, because we need to examine some set of recent messages to determine something about the chat channel as a whole. Flink's pure streaming architecture allows this windowing to be done efficiently and without buffering of individual messages, which allows for greater performance than a micro batch solution.
 
 ## Database
 
