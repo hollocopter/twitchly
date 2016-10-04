@@ -4,4 +4,4 @@ Twitchly is a real-time chat room analytics platform.
 
 ## Data Pipeline
 
-![Pipeline](http://imgur.com/a/H0DB1)
+![Pipeline](http://imgur.com/kAYcbO2)
