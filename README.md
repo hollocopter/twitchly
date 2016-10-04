@@ -20,6 +20,14 @@ The UI provides four tabs to view different metrics for each channel. The four t
 
 ## Ingestion
 
-## Streaming
+Ingestion is handled by a NodeJS Kafka producer script which maintains a connection to the 500 most popular irc channels on Twitch.tv at any given time. The raw messages are further augmented with data from Twitch.tv's REST API. The messages are then sent to Kafka for distribution over the cluster.
+
+## Stream Processing
+
+Apache Flink.
 
 ## Database
+
+Cassandra was chosen as the database to store a historical time series of channel states. The table is partitioned by the channel name and the date, with entries for each time stamp for the day. This allows for efficient retrieval of a historical day's worth of data to populate our graph.
+
+Redis was chosen as an efficient in-memory way to retain the top channels for each metric. One sorted set is kept for each metric in the application. This allows us to quickly update the top 10 channels for a given metric.
