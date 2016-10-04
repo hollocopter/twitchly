@@ -1,6 +1,6 @@
 # Twitchly - Track your chat rooms in real-time.
 
-Twitchly [twitchly.xyz] (http://twithcly.xyz) is a real-time chat room analytics platform powered by Kafka, Flink, Cassandra, Redis, Flask, and AngularJS. Twitchly allows advertisers or content creators to monitor Twitch.tv channel metrics in real-time or historically. These metrics can provide insight into which channels are the most exciting (and possibly most valuable) at any given time.
+Twitchly [twitchly.xyz] (http://twitchly.xyz) is a real-time chat room analytics platform powered by Kafka, Flink, Cassandra, Redis, Flask, and AngularJS. Twitchly allows advertisers or content creators to monitor Twitch.tv channel metrics in real-time or historically. These metrics can provide insight into which channels are the most exciting (and possibly most valuable) at any given time.
 
 ## Data Pipeline
 
